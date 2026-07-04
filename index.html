@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MemoryBooster — Daily Brain Training App</title>
+  <meta name="description" content="Train your brain with 7 scientifically-designed games: number memory, pattern recognition, mental math, focus reading, and more. 500+ exercises with progress tracking."/>
+  <meta name="keywords" content="brain training, memory games, mental math, pattern recognition, cognitive training"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+</head>
+<body>
+
+<!-- Particle Background -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- Confetti Canvas -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- Achievement Toast -->
+<div id="achievement-toast">
+  <div class="toast-icon">🏆</div>
+  <div class="toast-content">
+    <div class="toast-title">Achievement Unlocked!</div>
+    <div class="toast-name"></div>
+    <div class="toast-desc"></div>
+  </div>
+</div>
+
+<!-- Instructions Modal -->
+<div id="instructions-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🧠</div>
+    <div class="modal-title">Game Instructions</div>
+    <div class="modal-subtitle">How to play</div>
+    <div class="instruction-steps"></div>
+    <div style="display:flex;gap:12px">
+      <button class="btn btn-primary btn-full btn-lg" id="modal-start-btn">▶ Start Game</button>
+      <button class="btn btn-secondary btn-lg" onclick="document.getElementById('instructions-modal').classList.remove('show')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- App Root -->
+<div id="app">
+
+  <!-- Sidebar Navigation -->
+  <nav id="sidebar">
+    <div class="sidebar-logo-wrap">
+      <div class="sidebar-logo" onclick="App.navigate('dashboard')">🧠</div>
+      <span class="sidebar-logo-text">MemoryBooster</span>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-item active" data-page="dashboard" id="nav-dashboard">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="nav-item" data-page="games" id="nav-games">
+        <span class="nav-icon">🎮</span>
+        <span class="nav-label">Games</span>
+      </div>
+      <div class="nav-item" data-page="challenge" id="nav-challenge">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">30-Day Challenge</span>
+      </div>
+      <div class="nav-item" data-page="achievements" id="nav-achievements">
+        <span class="nav-icon">🏆</span>
+        <span class="nav-label">Achievements</span>
+      </div>
+      <div class="nav-item" data-page="stats" id="nav-stats">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Stats</span>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="nav-item" onclick="resetData()" title="Reset all data">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Settings</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main id="main-content">
+
+    <!-- Top Bar -->
+    <header id="top-bar">
+      <div class="top-bar-left">
+        <div class="top-bar-title">MemoryBooster</div>
+      </div>
+      <div class="top-bar-right">
+        <div class="stat-chip">
+          <span class="chip-icon">⚡</span>
+          <span class="chip-value" id="top-level">Lvl 1</span>
+        </div>
+        <div class="stat-chip">
+          <span class="chip-icon">⭐</span>
+          <span class="chip-value" id="top-xp">0</span>
+        </div>
+        <div class="stat-chip">
+          <span class="chip-icon">🔥</span>
+          <span class="chip-value" id="top-streak">0🔥</span>
+        </div>
+        <div class="stat-chip settings-toggle" onclick="resetData()" style="cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid var(--border);" title="Reset all data">
+          <span class="chip-icon">⚙️</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Pages -->
+    <!-- Dashboard Page -->
+    <div class="page active" id="page-dashboard">
+      <div style="display:flex;align-items:center;justify-content:center;height:200px;">
+        <div class="skeleton" style="width:200px;height:40px;border-radius:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Games Hub Page -->
+    <div class="page" id="page-games">
+      <div style="display:flex;align-items:center;justify-content:center;height:200px;">
+        <div class="skeleton" style="width:200px;height:40px;border-radius:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Challenge Page -->
+    <div class="page" id="page-challenge">
+      <div style="display:flex;align-items:center;justify-content:center;height:200px;">
+        <div class="skeleton" style="width:200px;height:40px;border-radius:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Achievements Page -->
+    <div class="page" id="page-achievements">
+      <div style="display:flex;align-items:center;justify-content:center;height:200px;">
+        <div class="skeleton" style="width:200px;height:40px;border-radius:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Stats Page -->
+    <div class="page" id="page-stats">
+      <div style="display:flex;align-items:center;justify-content:center;height:200px;">
+        <div class="skeleton" style="width:200px;height:40px;border-radius:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Game Screen (dynamic, overlays pages) -->
+    <div id="game-screen"></div>
+
+    <!-- Results Screen -->
+    <div id="results-screen"></div>
+
+  </main>
+</div>
+
+<!-- ===== Scripts ===== -->
+<!-- Load order: storage → data → ui → game modules → app -->
+<script src="js/storage.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/games/numberMemory.js"></script>
+<script src="js/games/findDifference.js"></script>
+<script src="js/games/reverseMemory.js"></script>
+<script src="js/games/wordAssociation.js"></script>
+<script src="js/games/mentalMath.js"></script>
+<script src="js/games/focusReading.js"></script>
+<script src="js/games/patternRecognition.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+  // Global helper used by game modules to forward to App
+  function resetData() {
+    if (confirm('Reset all your progress data? This cannot be undone.')) {
+      localStorage.clear();
+      location.reload();
+    }
+  }
+
+  // Polyfill for roundRect if not supported
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+      if (w < 2*r) r = w/2;
+      if (h < 2*r) r = h/2;
+      this.beginPath();
+      this.moveTo(x+r, y);
+      this.arcTo(x+w, y, x+w, y+h, r);
+      this.arcTo(x+w, y+h, x, y+h, r);
+      this.arcTo(x, y+h, x, y, r);
+      this.arcTo(x, y, x+w, y, r);
+      this.closePath();
+      return this;
+    };
+  }
+</script>
+</body>
+</html>
